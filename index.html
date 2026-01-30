@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VERA | Laberinto de Ética</title>
+    <style>
+        body { background: #0a0e14; color: #0095ff; font-family: sans-serif; text-align: center; margin: 0; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        canvas { background: #111; border: 2px solid #0095ff; box-shadow: 0 0 20px #0095ff; max-width: 90vw; max-height: 60vh; }
+        .controles { margin-top: 15px; display: grid; grid-template-areas: ". up ." "left . right" ". down ."; gap: 10px; }
+        .btn-móvil { width: 65px; height: 65px; background: rgba(0, 149, 255, 0.2); border: 2px solid #0095ff; color: #0095ff; border-radius: 50%; font-size: 30px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-móvil:active { background: #0095ff; color: #fff; }
+    </style>
+</head>
+<body>
+    <h1 style="margin: 5px; text-shadow: 0 0 10px #0095ff;">LABERINTO VERA</h1>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="controles">
+        <button style="grid-area: up;" class="btn-móvil" onclick="mover('arriba')">↑</button>
+        <button style="grid-area: left;" class="btn-móvil" onclick="mover('izquierda')">←</button>
+        <button style="grid-area: right;" class="btn-móvil" onclick="mover('derecha')">→</button>
+        <button style="grid-area: down;" class="btn-móvil" onclick="mover('abajo')">↓</button>
+    </div>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const TILE = 40;
+        let jugador = { x: 1, y: 1 };
+        const meta = { x: 8, y: 8 };
+        const mapa = [[1,1,1,1,1,1,1,1,1,1],[1,0,0,0,1,0,0,0,0,1],[1,0,1,0,1,0,1,1,0,1],[1,0,1,0,0,0,0,1,0,1],[1,0,1,1,1,1,0,1,0,1],[1,0,0,0,0,1,0,0,0,1],[1,1,1,1,0,1,1,1,0,1],[1,0,0,0,0,0,0,1,0,1],[1,0,1,1,1,1,0,0,0,1],[1,1,1,1,1,1,1,1,1,1]];
+        function dibujar() {
+            ctx.clearRect(0,0,400,400);
+            for(let y=0; y<10; y++){
+                for(let x=0; x<10; x++){
+                    if(mapa[y][x] === 1) { ctx.fillStyle = "#004466"; ctx.fillRect(x*TILE, y*TILE, TILE, TILE); }
+                }
+            }
+            ctx.fillStyle = "#ffd700"; ctx.fillRect(meta.x*TILE, meta.y*TILE, TILE, TILE);
+            ctx.fillStyle = "#0095ff"; ctx.shadowBlur = 15; ctx.shadowColor = "#0095ff";
+            ctx.fillRect(jugador.x*TILE + 5, jugador.y*TILE + 5, TILE-10, TILE-10);
+            ctx.shadowBlur = 0;
+        }
+        function mover(dir) {
+            let nx = jugador.x; let ny = jugador.y;
+            if(dir === 'arriba') ny--; if(dir === 'abajo') ny++;
+            if(dir === 'izquierda') nx--; if(dir === 'derecha') nx++;
+            if(mapa[ny] && mapa[ny][nx] === 0 || (nx === meta.x && ny === meta.y)) { jugador.x = nx; jugador.y = ny; }
+            if(jugador.x === meta.x && jugador.y === meta.y) {
+                setTimeout(() => { alert("¡Nivel Superado! Has seguido el Decálogo de Hierro."); jugador = {x:1, y:1}; dibujar(); }, 100);
+            }
+            dibujar();
+        }
+        dibujar();
+    </script>
+</body>
+</html>
