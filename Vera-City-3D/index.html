@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VERA-CITY 3D</title>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
+        #hud { position: absolute; top: 20px; width: 100%; text-align: center; color: #00f2ff; text-shadow: 0 0 10px #00f2ff; z-index: 10; pointer-events: none; }
+        .controles { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 15px; z-index: 10; }
+        .joy { width: 75px; height: 75px; background: rgba(0, 242, 255, 0.1); border: 2px solid #00f2ff; color: #fff; border-radius: 50%; font-size: 25px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="hud"><h2>VERA-CITY 3D</h2><p>EXPLORACIÓN ACTIVA</p></div>
+    <div class="controles">
+        <button class="joy" onmousedown="input('W')" ontouchstart="input('W')">↑</button>
+        <button class="joy" onmousedown="input('S')" ontouchstart="input('S')">↓</button>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        const scene = new THREE.Scene(); scene.background = new THREE.Color(0x020406);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight); document.body.appendChild(renderer.domElement);
+        scene.add(new THREE.AmbientLight(0x404040, 2));
+        const grid = new THREE.GridHelper(400, 80, 0x00f2ff, 0x002233); scene.add(grid);
+        const player = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial({ color: 0x00f2ff }));
+        player.position.y = 1; scene.add(player);
+        camera.position.set(0, 5, 10);
+        function input(key) {
+            if(key === 'W') player.position.z -= 0.8;
+            if(key === 'S') player.position.z += 0.8;
+        }
+        function animate() {
+            requestAnimationFrame(animate);
+            camera.position.lerp(new THREE.Vector3(player.position.x, player.position.y + 4, player.position.z + 8), 0.1);
+            camera.lookAt(player.position); renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
