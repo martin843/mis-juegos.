@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VERA-CITY | Open World</title>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
+        #hud { position: absolute; top: 20px; width: 100%; text-align: center; color: #00f2ff; text-shadow: 0 0 10px #00f2ff; pointer-events: none; z-index: 10; }
+        .controles { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; gap: 15px; z-index: 10; }
+        .joy { width: 70px; height: 70px; background: rgba(0, 242, 255, 0.1); border: 2px solid #00f2ff; color: #fff; border-radius: 50%; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="hud">
+        <h2>VERA-CITY v0.1</h2>
+        <p>MISIÓN: EXPLORAR LA CIUDAD ÉLITE</p>
+    </div>
+
+    <div class="controles">
+        <button class="joy" onmousedown="input('W')" ontouchstart="input('W')">↑</button>
+        <button class="joy" onmousedown="input('A')" ontouchstart="input('A')">←</button>
+        <button class="joy" onmousedown="input('S')" ontouchstart="input('S')">↓</button>
+        <button class="joy" onmousedown="input('D')" ontouchstart="input('D')">→</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x020406);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Luz Azul de la Tríada
+        const ambient = new THREE.AmbientLight(0x404040, 2); scene.add(ambient);
+        const light = new THREE.PointLight(0x00f2ff, 2, 50); light.position.set(0, 10, 0); scene.add(light);
+
+        // Piso (La Ciudad)
+        const grid = new THREE.GridHelper(400, 80, 0x00f2ff, 0x002233); scene.add(grid);
+
+        // Edificios (Cajas de ejemplo)
+        const geoEdificio = new THREE.BoxGeometry(4, 15, 4);
+        for(let i=0; i<40; i++) {
+            const mat = new THREE.MeshStandardMaterial({ color: 0x001122, wireframe: true });
+            const b = new THREE.Mesh(geoEdificio, mat);
+            b.position.set(Math.random()*200-100, 7.5, Math.random()*200-100);
+            scene.add(b);
+        }
+
+        // El Jugador (Cubo Azul)
+        const playerGeo = new THREE.BoxGeometry(1, 2, 1);
+        const playerMat = new THREE.MeshStandardMaterial({ color: 0x00f2ff, emissive: 0x00f2ff });
+        const player = new THREE.Mesh(playerGeo, playerMat);
+        player.position.y = 1;
+        scene.add(player);
+
+        camera.position.set(0, 5, 10);
+
+        function input(key) {
+            const speed = 0.5;
+            if(key === 'W') player.position.z -= speed;
+            if(key === 'S') player.position.z += speed;
+            if(key === 'A') player.position.x -= speed;
+            if(key === 'D') player.position.x += speed;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            // La cámara sigue al jugador estilo GTA
+            camera.position.lerp(new THREE.Vector3(player.position.x, player.position.y + 4, player.position.z + 8), 0.1);
+            camera.lookAt(player.position);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('keydown', (e) => input(e.key.toUpperCase()));
+    </script>
+</body>
+</html>
